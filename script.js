@@ -1,14 +1,15 @@
 function calculateItemAmount(price, quantity) {
-  return price * quantity;
+  return Number(price) * Number(quantity);
 }
 
 function calculateDiscount(subtotal) {
-  if (subtotal >= 5000) {
-    return subtotal * 0.10;
-  } else if (subtotal >= 3000) {
-    return subtotal * 0.07;
-  } else if (subtotal >= 1000) {
-    return subtotal * 0.05;
+  const sub = Number(subtotal);
+  if (sub >= 5000) {
+    return sub * 0.10;
+  } else if (sub >= 3000) {
+    return sub * 0.07;
+  } else if (sub >= 1000) {
+    return sub * 0.05;
   } else {
     return 0;
   }
@@ -27,31 +28,11 @@ function getDeliveryFee(option) {
   }
 }
 
-function getDeliveryTypeName(option) {
-  switch (Number(option)) {
-    case 1:
-      return "Store Pickup";
-    case 2:
-      return "Standard Delivery";
-    case 3:
-      return "Express Delivery";
-    default:
-      return "Store Pickup";
-  }
-}
-
-function getDiscountRateString(subtotal) {
-  if (subtotal >= 5000) return "10%";
-  if (subtotal >= 3000) return "7%";
-  if (subtotal >= 1000) return "5%";
-  return "0%";
-}
-
-const productCountInput = document.getElementById("productCount");
-const productsContainer = document.getElementById("productsContainer");
-
-productCountInput.addEventListener("input", function () {
+function renderProducts() {
+  const productCountInput = document.getElementById("productCount");
+  const productsContainer = document.getElementById("productsContainer");
   const count = parseInt(productCountInput.value, 10);
+  
   productsContainer.innerHTML = "";
 
   if (isNaN(count) || count <= 0) {
@@ -76,28 +57,32 @@ productCountInput.addEventListener("input", function () {
 
     productsContainer.appendChild(productCard);
   }
-});
+}
 
-const calculateBtn = document.getElementById("calculateBtn");
-const validationMessage = document.getElementById("validationMessage");
-const orderSummary = document.getElementById("orderSummary");
+document.getElementById("productCount").addEventListener("input", renderProducts);
+document.getElementById("productCount").addEventListener("change", renderProducts);
 
-calculateBtn.addEventListener("click", function () {
+window.addEventListener("DOMContentLoaded", renderProducts);
+
+document.getElementById("calculateBtn").addEventListener("click", function () {
+  const validationMessage = document.getElementById("validationMessage");
+  const orderSummary = document.getElementById("orderSummary");
+  
   validationMessage.textContent = "";
   orderSummary.textContent = "";
 
   const customerName = document.getElementById("customerName").value.trim();
   const productCountRaw = document.getElementById("productCount").value.trim();
-  const productCount = Number(productCountRaw);
+  const productCount = parseInt(productCountRaw, 10);
   const deliveryOption = document.getElementById("deliveryOption").value;
 
   if (customerName === "") {
-    validationMessage.textContent = "Error: Customer Name cannot be empty.";
+    validationMessage.textContent = "Customer Name cannot be empty.";
     return;
   }
 
-  if (productCountRaw === "" || isNaN(productCount) || productCount <= 0 || !Number.isInteger(productCount)) {
-    validationMessage.textContent = "Error: Please enter a valid positive number of products.";
+  if (productCountRaw === "" || isNaN(productCount) || productCount <= 0) {
+    validationMessage.textContent = "Please enter a valid number of products.";
     return;
   }
 
@@ -110,7 +95,7 @@ calculateBtn.addEventListener("click", function () {
     const quantityElem = document.getElementById(`productQuantity-${i}`);
 
     if (!nameElem || !priceElem || !quantityElem) {
-      validationMessage.textContent = "Error: Product input fields are incomplete or missing.";
+      validationMessage.textContent = "Missing product input fields.";
       return;
     }
 
@@ -119,15 +104,15 @@ calculateBtn.addEventListener("click", function () {
     const quantity = parseFloat(quantityElem.value);
 
     if (name === "") {
-      validationMessage.textContent = `Error: Product Name for item #${i + 1} cannot be empty.`;
+      validationMessage.textContent = "Product name cannot be empty.";
       return;
     }
     if (isNaN(price) || price <= 0) {
-      validationMessage.textContent = `Error: Please enter a valid positive price for item #${i + 1}.`;
+      validationMessage.textContent = "Please enter a valid price.";
       return;
     }
-    if (isNaN(quantity) || quantity <= 0 || !Number.isInteger(quantity)) {
-      validationMessage.textContent = `Error: Please enter a valid positive quantity for item #${i + 1}.`;
+    if (isNaN(quantity) || quantity <= 0) {
+      validationMessage.textContent = "Please enter a valid quantity.";
       return;
     }
 
@@ -137,19 +122,41 @@ calculateBtn.addEventListener("click", function () {
     productsSummaryText += `${i + 1}. ${name}\n`;
     productsSummaryText += `Price: ₱${price.toFixed(2)}\n`;
     productsSummaryText += `Quantity: ${quantity}\n`;
-    productsSummaryText += `Amount: ₱${itemAmount.toFixed(2)}\n\n`;
+    productsSummaryText += `Amount: ₱${itemAmount.toFixed(2)}\n`;
   }
 
   const discountAmount = calculateDiscount(subtotal);
-  const discountRate = getDiscountRateString(subtotal);
-  const deliveryFee = getDeliveryFee(deliveryOption);
-  const deliveryType = getDeliveryTypeName(deliveryOption);
-  const finalAmount = subtotal - discountAmount + deliveryFee;
-  const outputText = 
-`MINI STORE CHECKOUT SYSTEM
-Customer: ${customerName}
+  
+  let discountRate = "No discount";
+  if (subtotal >= 5000) {
+    discountRate = "10%";
+  } else if (subtotal >= 3000) {
+    discountRate = "7%";
+  } else if (subtotal >= 1000) {
+    discountRate = "5%";
+  }
 
-${productsSummaryText}ORDER SUMMARY
+  const deliveryFee = getDeliveryFee(deliveryOption);
+  
+  let deliveryType = "Store Pickup";
+  switch (Number(deliveryOption)) {
+    case 1:
+      deliveryType = "Store Pickup";
+      break;
+    case 2:
+      deliveryType = "Standard Delivery";
+      break;
+    case 3:
+      deliveryType = "Express Delivery";
+      break;
+  }
+
+  const finalAmount = subtotal - discountAmount + deliveryFee;
+
+  const outputText = `MINI STORE CHECKOUT SYSTEM
+Customer: ${customerName}
+${productsSummaryText}
+ORDER SUMMARY
 Subtotal: ₱${subtotal.toFixed(2)}
 Discount Rate: ${discountRate}
 Discount Amount: ₱${discountAmount.toFixed(2)}
