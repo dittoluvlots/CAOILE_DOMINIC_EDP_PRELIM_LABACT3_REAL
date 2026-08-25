@@ -27,7 +27,6 @@ function getDeliveryFee(option) {
   }
 }
 
-
 function getDeliveryTypeName(option) {
   switch (Number(option)) {
     case 1:
@@ -37,7 +36,7 @@ function getDeliveryTypeName(option) {
     case 3:
       return "Express Delivery";
     default:
-      return "Unknown";
+      return "Store Pickup";
   }
 }
 
@@ -52,20 +51,19 @@ const productCountInput = document.getElementById("productCount");
 const productsContainer = document.getElementById("productsContainer");
 
 productCountInput.addEventListener("input", function () {
-  const count = Number(productCountInput.value);
+  const count = parseInt(productCountInput.value, 10);
   productsContainer.innerHTML = "";
 
   if (isNaN(count) || count <= 0) {
     return;
   }
 
-  
   for (let i = 0; i < count; i++) {
     const productCard = document.createElement("div");
     productCard.className = "product-item";
-    
+
     productCard.innerHTML = `
-      <h3>Item #${i + 1}</h3>
+      <h3>Product #${i + 1}</h3>
       <label for="productName-${i}">Product Name</label>
       <input type="text" id="productName-${i}" placeholder="Product Name"><br>
 
@@ -85,20 +83,20 @@ const validationMessage = document.getElementById("validationMessage");
 const orderSummary = document.getElementById("orderSummary");
 
 calculateBtn.addEventListener("click", function () {
-  
   validationMessage.textContent = "";
   orderSummary.textContent = "";
 
   const customerName = document.getElementById("customerName").value.trim();
-  const productCount = Number(document.getElementById("productCount").value);
+  const productCountRaw = document.getElementById("productCount").value.trim();
+  const productCount = Number(productCountRaw);
   const deliveryOption = document.getElementById("deliveryOption").value;
 
   if (customerName === "") {
     validationMessage.textContent = "Error: Customer Name cannot be empty.";
     return;
   }
-  
-  if (isNaN(productCount) || productCount <= 0) {
+
+  if (productCountRaw === "" || isNaN(productCount) || productCount <= 0 || !Number.isInteger(productCount)) {
     validationMessage.textContent = "Error: Please enter a valid positive number of products.";
     return;
   }
@@ -112,13 +110,13 @@ calculateBtn.addEventListener("click", function () {
     const quantityElem = document.getElementById(`productQuantity-${i}`);
 
     if (!nameElem || !priceElem || !quantityElem) {
-      validationMessage.textContent = "Error: Product inputs are missing or incomplete.";
+      validationMessage.textContent = "Error: Product input fields are incomplete or missing.";
       return;
     }
 
     const name = nameElem.value.trim();
     const price = parseFloat(priceElem.value);
-    const quantity = parseInt(quantityElem.value, 10);
+    const quantity = parseFloat(quantityElem.value);
 
     if (name === "") {
       validationMessage.textContent = `Error: Product Name for item #${i + 1} cannot be empty.`;
@@ -128,20 +126,18 @@ calculateBtn.addEventListener("click", function () {
       validationMessage.textContent = `Error: Please enter a valid positive price for item #${i + 1}.`;
       return;
     }
-    if (isNaN(quantity) || quantity <= 0) {
+    if (isNaN(quantity) || quantity <= 0 || !Number.isInteger(quantity)) {
       validationMessage.textContent = `Error: Please enter a valid positive quantity for item #${i + 1}.`;
       return;
     }
 
     const itemAmount = calculateItemAmount(price, quantity);
-    
-    
     subtotal += itemAmount;
 
     productsSummaryText += `${i + 1}. ${name}\n`;
-    productsSummaryText += `   Price: ₱${price.toFixed(2)}\n`;
-    productsSummaryText += `   Quantity: ${quantity}\n`;
-    productsSummaryText += `   Amount: ₱${itemAmount.toFixed(2)}\n`;
+    productsSummaryText += `Price: ₱${price.toFixed(2)}\n`;
+    productsSummaryText += `Quantity: ${quantity}\n`;
+    productsSummaryText += `Amount: ₱${itemAmount.toFixed(2)}\n\n`;
   }
 
   const discountAmount = calculateDiscount(subtotal);
@@ -149,20 +145,17 @@ calculateBtn.addEventListener("click", function () {
   const deliveryFee = getDeliveryFee(deliveryOption);
   const deliveryType = getDeliveryTypeName(deliveryOption);
   const finalAmount = subtotal - discountAmount + deliveryFee;
- const outputText = 
- 
+  const outputText = 
 `MINI STORE CHECKOUT SYSTEM
 Customer: ${customerName}
 
-${productsSummaryText}
-ORDER SUMMARY
+${productsSummaryText}ORDER SUMMARY
 Subtotal: ₱${subtotal.toFixed(2)}
 Discount Rate: ${discountRate}
 Discount Amount: ₱${discountAmount.toFixed(2)}
 Delivery Type: ${deliveryType}
 Delivery Fee: ₱${deliveryFee.toFixed(2)}
 Final Amount: ₱${finalAmount.toFixed(2)}`;
-
 
   orderSummary.textContent = outputText;
 });
