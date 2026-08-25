@@ -16,12 +16,12 @@ function calculateDiscount(subtotal) {
 }
 
 function getDeliveryFee(option) {
-  switch (Number(option)) {
-    case 1:
+  switch (String(option)) {
+    case "1":
       return 0;
-    case 2:
+    case "2":
       return 80;
-    case 3:
+    case "3":
       return 150;
     default:
       return 0;
@@ -44,7 +44,6 @@ function renderProducts() {
     productCard.className = "product-item";
 
     productCard.innerHTML = `
-      <h3>Product #${i + 1}</h3>
       <label for="productName-${i}">Product Name</label>
       <input type="text" id="productName-${i}" placeholder="Product Name"><br>
 
@@ -52,7 +51,7 @@ function renderProducts() {
       <input type="number" id="productPrice-${i}" step="0.01" min="0" placeholder="Price"><br>
 
       <label for="productQuantity-${i}">Quantity</label>
-      <input type="number" id="productQuantity-${i}" min="1" placeholder="Quantity"><br><br>
+      <input type="number" id="productQuantity-${i}" min="1" placeholder="Quantity"><br>
     `;
 
     productsContainer.appendChild(productCard);
@@ -61,8 +60,6 @@ function renderProducts() {
 
 document.getElementById("productCount").addEventListener("input", renderProducts);
 document.getElementById("productCount").addEventListener("change", renderProducts);
-
-window.addEventListener("DOMContentLoaded", renderProducts);
 
 document.getElementById("calculateBtn").addEventListener("click", function () {
   const validationMessage = document.getElementById("validationMessage");
@@ -119,15 +116,12 @@ document.getElementById("calculateBtn").addEventListener("click", function () {
     const itemAmount = calculateItemAmount(price, quantity);
     subtotal += itemAmount;
 
-    productsSummaryText += `${i + 1}. ${name}\n`;
-    productsSummaryText += `Price: ₱${price.toFixed(2)}\n`;
-    productsSummaryText += `Quantity: ${quantity}\n`;
-    productsSummaryText += `Amount: ₱${itemAmount.toFixed(2)}\n`;
+    productsSummaryText += `${i + 1}. ${name}\nPrice: ₱${price.toFixed(2)}\nQuantity: ${quantity}\nAmount: ₱${itemAmount.toFixed(2)}\n\n`;
   }
 
   const discountAmount = calculateDiscount(subtotal);
   
-  let discountRate = "No discount";
+  let discountRate = "0%";
   if (subtotal >= 5000) {
     discountRate = "10%";
   } else if (subtotal >= 3000) {
@@ -139,14 +133,14 @@ document.getElementById("calculateBtn").addEventListener("click", function () {
   const deliveryFee = getDeliveryFee(deliveryOption);
   
   let deliveryType = "Store Pickup";
-  switch (Number(deliveryOption)) {
-    case 1:
+  switch (String(deliveryOption)) {
+    case "1":
       deliveryType = "Store Pickup";
       break;
-    case 2:
+    case "2":
       deliveryType = "Standard Delivery";
       break;
-    case 3:
+    case "3":
       deliveryType = "Express Delivery";
       break;
   }
@@ -155,8 +149,8 @@ document.getElementById("calculateBtn").addEventListener("click", function () {
 
   const outputText = `MINI STORE CHECKOUT SYSTEM
 Customer: ${customerName}
-${productsSummaryText}
-ORDER SUMMARY
+
+${productsSummaryText}ORDER SUMMARY
 Subtotal: ₱${subtotal.toFixed(2)}
 Discount Rate: ${discountRate}
 Discount Amount: ₱${discountAmount.toFixed(2)}
@@ -164,5 +158,5 @@ Delivery Type: ${deliveryType}
 Delivery Fee: ₱${deliveryFee.toFixed(2)}
 Final Amount: ₱${finalAmount.toFixed(2)}`;
 
-  orderSummary.textContent = outputText;
+  orderSummary.innerText = outputText;
 });
