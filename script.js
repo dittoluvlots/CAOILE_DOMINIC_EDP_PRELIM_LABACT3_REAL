@@ -16,12 +16,12 @@ function calculateDiscount(subtotal) {
 }
 
 function getDeliveryFee(option) {
-  switch (Number(option)) {
-    case 1:
+  switch (String(option)) {
+    case "1":
       return 0;
-    case 2:
+    case "2":
       return 80;
-    case 3:
+    case "3":
       return 150;
     default:
       return 0;
@@ -58,21 +58,10 @@ function renderProducts() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  const productCountElem = document.getElementById("productCount");
-  const calculateBtnElem = document.getElementById("calculateBtn");
+document.getElementById("productCount").addEventListener("input", renderProducts);
+document.getElementById("productCount").addEventListener("change", renderProducts);
 
-  if (productCountElem) {
-    productCountElem.addEventListener("input", renderProducts);
-    productCountElem.addEventListener("change", renderProducts);
-  }
-
-  if (calculateBtnElem) {
-    calculateBtnElem.addEventListener("click", processCheckout);
-  }
-});
-
-function processCheckout() {
+document.getElementById("calculateBtn").addEventListener("click", function () {
   const validationMessage = document.getElementById("validationMessage");
   const orderSummary = document.getElementById("orderSummary");
   
@@ -171,4 +160,4 @@ Delivery Fee: ₱${deliveryFee.toFixed(2)}
 Final Amount: ₱${finalAmount.toFixed(2)}`;
 
   orderSummary.textContent = outputText;
-}
+});
