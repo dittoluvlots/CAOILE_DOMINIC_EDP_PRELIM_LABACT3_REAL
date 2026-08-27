@@ -16,12 +16,12 @@ function calculateDiscount(subtotal) {
 }
 
 function getDeliveryFee(option) {
-  switch (String(option)) {
-    case "1":
+  switch (Number(option)) {
+    case 1:
       return 0;
-    case "2":
+    case 2:
       return 80;
-    case "3":
+    case 3:
       return 150;
     default:
       return 0;
@@ -58,10 +58,21 @@ function renderProducts() {
   }
 }
 
-document.getElementById("productCount").addEventListener("input", renderProducts);
-document.getElementById("productCount").addEventListener("change", renderProducts);
+document.addEventListener("DOMContentLoaded", function () {
+  const productCountElem = document.getElementById("productCount");
+  const calculateBtnElem = document.getElementById("calculateBtn");
 
-document.getElementById("calculateBtn").addEventListener("click", function () {
+  if (productCountElem) {
+    productCountElem.addEventListener("input", renderProducts);
+    productCountElem.addEventListener("change", renderProducts);
+  }
+
+  if (calculateBtnElem) {
+    calculateBtnElem.addEventListener("click", processCheckout);
+  }
+});
+
+function processCheckout() {
   const validationMessage = document.getElementById("validationMessage");
   const orderSummary = document.getElementById("orderSummary");
   
@@ -116,7 +127,7 @@ document.getElementById("calculateBtn").addEventListener("click", function () {
     const itemAmount = calculateItemAmount(price, quantity);
     subtotal += itemAmount;
 
-    productsSummaryText += `${i + 1}.\n${name}\n   Price: ₱${price.toFixed(2)}\n   Quantity: ${quantity}\n   Amount: ₱${itemAmount.toFixed(2)}\n\n`;
+    productsSummaryText += `${i + 1}. ${name}\n   Price: ₱${price.toFixed(2)}\n   Quantity: ${quantity}\n   Amount: ₱${itemAmount.toFixed(2)}\n\n`;
   }
 
   const discountAmount = calculateDiscount(subtotal);
@@ -149,8 +160,7 @@ document.getElementById("calculateBtn").addEventListener("click", function () {
 
   const outputText = `MINI STORE CHECKOUT SYSTEM
 
-Customer:
-${customerName}
+Customer: ${customerName}
 
 ${productsSummaryText}ORDER SUMMARY
 Subtotal: ₱${subtotal.toFixed(2)}
@@ -160,5 +170,5 @@ Delivery Type: ${deliveryType}
 Delivery Fee: ₱${deliveryFee.toFixed(2)}
 Final Amount: ₱${finalAmount.toFixed(2)}`;
 
-  orderSummary.textContent = outputText.trim();
-});
+  orderSummary.textContent = outputText;
+}
