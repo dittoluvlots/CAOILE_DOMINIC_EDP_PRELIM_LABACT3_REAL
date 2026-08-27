@@ -101,15 +101,15 @@ document.getElementById("calculateBtn").addEventListener("click", function () {
     const quantity = parseFloat(quantityElem.value);
 
     if (name === "") {
-      validationMessage.textContent = `Product name for item ${i + 1} cannot be empty.`;
+      validationMessage.textContent = "Product name cannot be empty.";
       return;
     }
     if (isNaN(price) || price < 0) {
-      validationMessage.textContent = `Please enter a valid positive price for item ${i + 1}.`;
+      validationMessage.textContent = "Please enter a valid price.";
       return;
     }
     if (isNaN(quantity) || quantity <= 0) {
-      validationMessage.textContent = `Please enter a valid quantity greater than 0 for item ${i + 1}.`;
+      validationMessage.textContent = "Please enter a valid quantity.";
       return;
     }
 
@@ -128,8 +128,6 @@ document.getElementById("calculateBtn").addEventListener("click", function () {
     discountRate = "7%";
   } else if (subtotal >= 1000) {
     discountRate = "5%";
-  } else {
-    discountRate = "0%";
   }
 
   const deliveryFee = getDeliveryFee(deliveryOption);
