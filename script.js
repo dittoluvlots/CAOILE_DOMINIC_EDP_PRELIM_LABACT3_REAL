@@ -116,7 +116,7 @@ document.getElementById("calculateBtn").addEventListener("click", function () {
     const itemAmount = calculateItemAmount(price, quantity);
     subtotal += itemAmount;
 
-    productsSummaryText += `${i + 1}. ${name}\n   Price: ₱${price.toFixed(2)}\n   Quantity: ${quantity}\n   Amount: ₱${itemAmount.toFixed(2)}\n\n`;
+    productsSummaryText += `${i + 1}.\n${name}\n   Price: ₱${price.toFixed(2)}\n   Quantity: ${quantity}\n   Amount: ₱${itemAmount.toFixed(2)}\n\n`;
   }
 
   const discountAmount = calculateDiscount(subtotal);
@@ -127,14 +127,10 @@ document.getElementById("calculateBtn").addEventListener("click", function () {
   } else if (subtotal >= 3000) {
     discountRate = "7%";
   } else if (subtotal >= 1000) {
-    discountRate = "5%ger"; // Cleaned fallback
+    discountRate = "5%";
+  } else {
+    discountRate = "0%";
   }
-
-  // Fixing strict bracket rate check for clarity
-  if (subtotal >= 5000) discountRate = "10%";
-  else if (subtotal >= 3000) discountRate = "7%";
-  else if (subtotal >= 1000) discountRate = "5%";
-  else discountRate = "0%";
 
   const deliveryFee = getDeliveryFee(deliveryOption);
   
@@ -155,7 +151,8 @@ document.getElementById("calculateBtn").addEventListener("click", function () {
 
   const outputText = `MINI STORE CHECKOUT SYSTEM
 
-Customer: ${customerName}
+Customer:
+${customerName}
 
 ${productsSummaryText}ORDER SUMMARY
 Subtotal: ₱${subtotal.toFixed(2)}
@@ -165,5 +162,5 @@ Delivery Type: ${deliveryType}
 Delivery Fee: ₱${deliveryFee.toFixed(2)}
 Final Amount: ₱${finalAmount.toFixed(2)}`;
 
-  orderSummary.textContent = outputText;
+  orderSummary.textContent = outputText.trim();
 });
